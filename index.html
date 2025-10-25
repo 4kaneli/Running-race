@@ -4,128 +4,22 @@
 <meta charset="UTF-8">
 <title>Running race!</title>
 <style>
-body {
-  font-family: sans-serif;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 0;
-  background: #fff9dc; /* giallino chiaro */
-  padding-top: 0px;
-}
-
-#titolo {
-  color: #000;
-  margin-bottom: -10px;
-  text-align: center;
-  font-size: 48px;
-}
-
-#subtitolo {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 20px;
-  position: relative;
-  top: 20px;
-}
-
-#inputs {
-  margin-top: 20px;
-  margin-bottom: 12px;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px 20px;
-}
-
-#gioco { 
-  grid-column: 1 / span 2;
-  padding: 6px 10px; 
-  font-size: 16px; 
-  width: 320px;
-}
-
-#inputs input:not(#gioco) { 
-  padding: 6px 10px; 
-  font-size: 16px; 
-  width: 140px; 
-}
-
-#inputs button {
-  grid-column: 1 / span 2;
-  margin-top: 10px;
-  padding: 12px 24px;
-  font-size: 18px;
-  background-color: yellow;
-  border: 1px solid #333;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-#inputs button:active {
-  background-color: #966cff;
-  color: #fff;
-}
-
-#pista {
-  position: relative;
-  width: 1450px;
-  height: 600px;
-  background-color: #3bd467;
-  border: 2px solid #000;
-  overflow: hidden;
-  margin-bottom: 4px;
-  margin-top: 10px;
-}
-
-#traguardo {
-  position: absolute;
-  width: 85.2px;
-  height: 690px;
-  right: 0;
-  top: 0;
-  background-image: url('scacchi.jpg');
-  background-size: cover;
-  background-repeat: no-repeat;
-}
-
-#countdown {
-  position: absolute;
-  top: 45%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 80px;
-  font-weight: bold;
-  color: yellow;
-  text-shadow: 2px 2px 5px #000;
-  display: none;
-}
-
+/* -- Tutto il tuo CSS originale -- */
+body { font-family: sans-serif; display: flex; flex-direction: column; align-items: center; margin: 0; background: #fff9dc; padding-top: 0px; }
+#titolo { color: #000; margin-bottom: -10px; text-align: center; font-size: 48px; }
+#subtitolo { font-size: 24px; color: #333; margin-bottom: 20px; position: relative; top: 20px; }
+#inputs { margin-top: 20px; margin-bottom: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+#gioco { grid-column: 1 / span 2; padding: 6px 10px; font-size: 16px; width: 320px; }
+#inputs input:not(#gioco) { padding: 6px 10px; font-size: 16px; width: 140px; }
+#inputs button { grid-column: 1 / span 2; margin-top: 10px; padding: 12px 24px; font-size: 18px; background-color: yellow; border: 1px solid #333; cursor: pointer; transition: all 0.2s; }
+#inputs button:active { background-color: #966cff; color: #fff; }
+#pista { position: relative; width: 1450px; height: 600px; background-color: #3bd467; border: 2px solid #000; overflow: hidden; margin-bottom: 4px; margin-top: 10px; }
+#traguardo { position: absolute; width: 85.2px; height: 690px; right: 0; top: 0; background-image: url('scacchi.jpg'); background-size: cover; background-repeat: no-repeat; }
+#countdown { position: absolute; top: 45%; left: 50%; transform: translate(-50%, -50%); font-size: 80px; font-weight: bold; color: yellow; text-shadow: 2px 2px 5px #000; display: none; }
 /* Stickman */
-.stickman { 
-  position: absolute; 
-  display: flex; 
-  flex-direction: column; 
-  align-items: center; 
-}
-
-.stickman .nome {
-  position: absolute; 
-  bottom: 100%; 
-  font-size: 20px; 
-  font-weight: bold;
-  color: #000; 
-  text-align: center; 
-  white-space: nowrap;
-}
-
-/* PNG come testa */
-.head img {
-  width: 70px;
-  height: 70px;
-  margin-bottom: -8px; /* avvicina al corpo */
-}
-
-/* Corpo stickman */
+.stickman { position: absolute; display: flex; flex-direction: column; align-items: center; }
+.stickman .nome { position: absolute; bottom: 100%; font-size: 20px; font-weight: bold; color: #000; text-align: center; white-space: nowrap; }
+.head img { width: 70px; height: 70px; margin-bottom: -8px; }
 .torso { width: 22.6px; height: 30.55px; position: relative; background-color: #eee; }
 .arm { width: 8.25px; height: 33.65px; background-color: #000; position: absolute; top: 4px; }
 .arm.left { left: -10px; transform: rotate(9deg);}
@@ -133,22 +27,9 @@ body {
 .leg { width: 8.25px; height: 31.65px; background-color: #000; position: absolute; bottom: -31.65px; transform-origin: top center;}
 .leg.left { left:0; animation: runLegs 0.5s infinite;}
 .leg.right { right:0; animation: runLegs 0.5s infinite reverse;}
-
-@keyframes runLegs {
-  0% { transform: rotate(-30deg); }
-  50% { transform: rotate(30deg); }
-  100% { transform: rotate(-30deg); }
-}
-
-/* Bandiere decorative */
-#flag1, #flag2 {
-  position: absolute;
-  top: 20px;
-  width: 400px;
-  height: 350px;
-}
-#flag1 { left: 290px; }
-#flag2 { left: 820px; }
+@keyframes runLegs { 0% { transform: rotate(-30deg); } 50% { transform: rotate(30deg); } 100% { transform: rotate(-30deg); } }
+#flag1, #flag2 { position: absolute; top: 20px; width: 400px; height: 350px; }
+#flag1 { left: 290px; } #flag2 { left: 820px; }
 </style>
 </head>
 <body>
@@ -190,17 +71,6 @@ const audioStart = document.getElementById("audioStart");
 const audioStadio = document.getElementById("audioStadio");
 const audioWin = document.getElementById("audioWin");
 
-// 🎵 musica sottofondo iniziale
-const audioGame = new Audio("game.mp3");
-audioGame.loop = true;
-audioGame.volume = 0.6;
-window.addEventListener("click", () => {
-  if (audioGame.paused) {
-    audioGame.play();
-  }
-}, { once: true });
-
-
 const flag1 = document.getElementById("flag1");
 const flag2 = document.getElementById("flag2");
 
@@ -220,12 +90,10 @@ function resetGame(){
   subtitolo.textContent = "";
   flag1.style.display="block";
   flag2.style.display="block";
-  audioGame.currentTime = 0;
-  audioGame.play();
 }
 
-startBtn.addEventListener("click",()=>{
-  const gioco = document.getElementById("gioco").value;
+function startGame(){
+  const gioco = document.getElementById("gioco").value.trim();
   nomiPartecipanti = [
     document.getElementById("nome1").value.trim(),
     document.getElementById("nome2").value.trim(),
@@ -237,10 +105,6 @@ startBtn.addEventListener("click",()=>{
     alert("Inserisci almeno 2 partecipanti e il premio!");
     return;
   }
-
-  // stop musica sottofondo
-  audioGame.pause();
-  audioGame.currentTime = 0;
 
   inputsDiv.style.display="none";
   flag1.style.display="none";
@@ -320,6 +184,14 @@ startBtn.addEventListener("click",()=>{
 
     requestAnimationFrame(passo);
   }
+}
+
+// Eventi: click e Enter
+startBtn.addEventListener("click", startGame);
+document.querySelectorAll('#inputs input').forEach(inp=>{
+  inp.addEventListener("keydown", (e)=>{
+    if(e.key === "Enter") startGame();
+  });
 });
 </script>
 </body>
