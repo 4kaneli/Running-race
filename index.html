@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>Running race!</title>
+<style>
+body {
+  font-family: sans-serif;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  background: #fff9dc; /* giallino chiaro */
+  padding-top: 0px;
+}
+
+#titolo {
+  color: #000;
+  margin-bottom: -10px;
+  text-align: center;
+  font-size: 48px;
+}
+
+#subtitolo {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  position: relative;
+  top: 20px;
+}
+
+#inputs {
+  margin-top: 20px;
+  margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 20px;
+}
+
+#gioco { 
+  grid-column: 1 / span 2;
+  padding: 6px 10px; 
+  font-size: 16px; 
+  width: 320px;
+}
+
+#inputs input:not(#gioco) { 
+  padding: 6px 10px; 
+  font-size: 16px; 
+  width: 140px; 
+}
+
+#inputs button {
+  grid-column: 1 / span 2;
+  margin-top: 10px;
+  padding: 12px 24px;
+  font-size: 18px;
+  background-color: yellow;
+  border: 1px solid #333;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#inputs button:active {
+  background-color: #966cff;
+  color: #fff;
+}
+
+#pista {
+  position: relative;
+  width: 1450px;
+  height: 600px;
+  background-color: #3bd467;
+  border: 2px solid #000;
+  overflow: hidden;
+  margin-bottom: 4px;
+  margin-top: 10px;
+}
+
+#traguardo {
+  position: absolute;
+  width: 85.2px;
+  height: 690px;
+  right: 0;
+  top: 0;
+  background-image: url('scacchi.jpg');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+#countdown {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 80px;
+  font-weight: bold;
+  color: yellow;
+  text-shadow: 2px 2px 5px #000;
+  display: none;
+}
+
+/* Stickman */
+.stickman { 
+  position: absolute; 
+  display: flex; 
+  flex-direction: column; 
+  align-items: center; 
+}
+
+.stickman .nome {
+  position: absolute; 
+  bottom: 100%; 
+  font-size: 20px; 
+  font-weight: bold;
+  color: #000; 
+  text-align: center; 
+  white-space: nowrap;
+}
+
+/* PNG come testa */
+.head img {
+  width: 70px;
+  height: 70px;
+  margin-bottom: -8px; /* avvicina al corpo */
+}
+
+/* Corpo stickman */
+.torso { width: 22.6px; height: 30.55px; position: relative; background-color: #eee; }
+.arm { width: 8.25px; height: 33.65px; background-color: #000; position: absolute; top: 4px; }
+.arm.left { left: -10px; transform: rotate(9deg);}
+.arm.right { right: -10px; transform: rotate(-9deg);}
+.leg { width: 8.25px; height: 31.65px; background-color: #000; position: absolute; bottom: -31.65px; transform-origin: top center;}
+.leg.left { left:0; animation: runLegs 0.5s infinite;}
+.leg.right { right:0; animation: runLegs 0.5s infinite reverse;}
+
+@keyframes runLegs {
+  0% { transform: rotate(-30deg); }
+  50% { transform: rotate(30deg); }
+  100% { transform: rotate(-30deg); }
+}
+
+/* Bandiere decorative */
+#flag1, #flag2 {
+  position: absolute;
+  top: 20px;
+  width: 400px;
+  height: 350px;
+}
+#flag1 { left: 290px; }
+#flag2 { left: 820px; }
+</style>
+</head>
+<body>
+
+<h1 id="titolo">Running race!</h1>
+<div id="subtitolo"></div>
+
+<img id="flag1" src="flag.png" alt="Flag 1">
+<img id="flag2" src="flag2.png" alt="Flag 2">
+
+<div id="inputs">
+  <input id="gioco" type="text" placeholder="What do you win? 🤔 ">
+  <input id="nome1" type="text" placeholder="Participant 1">
+  <input id="nome2" type="text" placeholder="Participant 2">
+  <input id="nome3" type="text" placeholder="Participant 3">
+  <input id="nome4" type="text" placeholder="Participant 4">
+  <button id="startBtn">Start</button>
+</div>
+
+<div id="pista">
+  <div id="traguardo"></div>
+  <div id="countdown">3</div>
+</div>
+
+<audio id="audioCheck" src="check.wav"></audio>
+<audio id="audioStart" src="start.wav"></audio>
+<audio id="audioStadio" src="stadio.wav" loop></audio>
+<audio id="audioWin" src="win.wav"></audio>
+
+<script>
+const pista = document.getElementById("pista");
+const startBtn = document.getElementById("startBtn");
+const titolo = document.getElementById("titolo");
+const subtitolo = document.getElementById("subtitolo");
+const inputsDiv = document.getElementById("inputs");
+const countdownEl = document.getElementById("countdown");
+const audioCheck = document.getElementById("audioCheck");
+const audioStart = document.getElementById("audioStart");
+const audioStadio = document.getElementById("audioStadio");
+const audioWin = document.getElementById("audioWin");
+
+// 🎵 musica sottofondo iniziale
+const audioGame = new Audio("game.mp3");
+audioGame.loop = true;
+audioGame.volume = 0.6;
+window.addEventListener("click", () => {
+  if (audioGame.paused) {
+    audioGame.play();
+  }
+}, { once: true });
+
+
+const flag1 = document.getElementById("flag1");
+const flag2 = document.getElementById("flag2");
+
+let nomiPartecipanti = [];
+let stickmen = [];
+let posX = [];
+let posY = [30, 180, 310, 460];
+const pngPersonaggi = ["cat.png","rabbit.png","scoiattolo.png","dog.png"];
+const coloriTorso = ["#e74c3c","#3498db","#FFFF00","#ff69b4"];
+
+function resetGame(){
+  posX = [];
+  stickmen.forEach(sm => sm.remove());
+  stickmen = [];
+  inputsDiv.style.display="grid";
+  titolo.textContent = "Running race!!🏆";
+  subtitolo.textContent = "";
+  flag1.style.display="block";
+  flag2.style.display="block";
+  audioGame.currentTime = 0;
+  audioGame.play();
+}
+
+startBtn.addEventListener("click",()=>{
+  const gioco = document.getElementById("gioco").value;
+  nomiPartecipanti = [
+    document.getElementById("nome1").value.trim(),
+    document.getElementById("nome2").value.trim(),
+    document.getElementById("nome3").value.trim(),
+    document.getElementById("nome4").value.trim()
+  ].filter(n => n !== "");
+
+  if(gioco=="" || nomiPartecipanti.length < 2){
+    alert("Inserisci almeno 2 partecipanti e il premio!");
+    return;
+  }
+
+  // stop musica sottofondo
+  audioGame.pause();
+  audioGame.currentTime = 0;
+
+  inputsDiv.style.display="none";
+  flag1.style.display="none";
+  flag2.style.display="none";
+
+  posX = new Array(nomiPartecipanti.length).fill(45);
+  for(let i=0;i<nomiPartecipanti.length;i++){
+    const sm = document.createElement("div");
+    sm.classList.add("stickman");
+    sm.style.top = posY[i]+"px";
+    sm.style.left = posX[i]+"px";
+    sm.innerHTML = `
+      <div class="nome">${nomiPartecipanti[i]}</div>
+      <div class="head"><img src="${pngPersonaggi[i]}" alt="Personaggio ${i+1}"></div>
+      <div class="torso" style="background-color:${coloriTorso[i]}">
+        <div class="arm left"></div>
+        <div class="arm right"></div>
+        <div class="leg left"></div>
+        <div class="leg right"></div>
+      </div>`;
+    pista.appendChild(sm);
+    stickmen.push(sm);
+  }
+
+  // Countdown
+  let count = 3;
+  countdownEl.style.display = "block";
+  countdownEl.textContent = count;
+  audioCheck.play();
+  const countdownInterval = setInterval(()=>{
+    count--;
+    if(count>0){
+      countdownEl.textContent = count;
+      audioCheck.currentTime=0; audioCheck.play();
+    } else {
+      clearInterval(countdownInterval);
+      countdownEl.style.display = "none";
+      audioStart.play();
+      audioStadio.play();
+      startRace();
+    }
+  },1000);
+
+  function startRace(){
+    const larghezzaTraguardo = pista.offsetWidth - 85.2; 
+    const velocitaBase = new Array(nomiPartecipanti.length).fill(0.08);
+    const maxBoost = 0.9;
+    const minVel = 0.02;
+    let raceOver = false;
+
+    function passo(){
+      if(raceOver) return;
+      stickmen.forEach((sm,i)=>{
+        let velocitaAttuale = velocitaBase[i] + (Math.random()-0.5)*0.05;
+        if(Math.random() < 0.02){ velocitaAttuale += Math.random()*maxBoost; }
+        if(velocitaAttuale < minVel) velocitaAttuale = minVel;
+
+        posX[i] += velocitaAttuale*10;
+        if(posX[i]>=larghezzaTraguardo && !raceOver){
+          posX[i] = larghezzaTraguardo;
+          raceOver = true;
+          audioStadio.pause();
+          audioStadio.currentTime=0;
+          audioWin.play();
+          titolo.textContent = `The winner is ${nomiPartecipanti[i]}!`;
+          subtitolo.style.top = "9px";
+          subtitolo.textContent = `${nomiPartecipanti[i]} wins ${gioco}! 🏆`;
+          setTimeout(resetGame,10000);
+        }
+        sm.style.left = posX[i]+"px";
+      });
+
+      if(!raceOver){
+        requestAnimationFrame(passo);
+      }
+    }
+
+    requestAnimationFrame(passo);
+  }
+});
+</script>
+</body>
+</html>
